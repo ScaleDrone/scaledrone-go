@@ -1,6 +1,7 @@
 # Scaledrone Go Client
 
 scaledrone-go is a Go client package for accessing the Scaledrone REST API.
+![gopher](https://raw.githubusercontent.com/scaledrone/scaledrone-go/master/gopher.png)
 
 # Example
 
