@@ -11,30 +11,30 @@ import (
 const baseURL string = "https://api2.scaledrone.com"
 
 // Scaledrone is the main struct for the API
-type Scaledrone struct {
+type Client struct {
 	ChannelID string
 	SecretKey string
 	Bearer    string
 }
 
 // NewBasicAuthClient returns a new Scaledrone client that uses Basic Authentication for authentication
-func NewBasicAuthClient(channelID, secretKey string) *Scaledrone {
-	return &Scaledrone{
+func NewBasicAuthClient(channelID, secretKey string) *Client {
+	return &Client{
 		ChannelID: channelID,
 		SecretKey: secretKey,
 	}
 }
 
 // NewBearerClient returns a new Scaledrone client that uses Bearer token for authentication
-func NewBearerClient(channelID, bearer string) *Scaledrone {
-	return &Scaledrone{
+func NewBearerClient(channelID, bearer string) *Client {
+	return &Client{
 		ChannelID: channelID,
 		Bearer:    bearer,
 	}
 }
 
 // Publish sends a message to a single room
-func (s *Scaledrone) Publish(message []byte, room string) error {
+func (s *Client) Publish(message []byte, room string) error {
 	url := fmt.Sprintf(baseURL+"/%s/%s/publish", s.ChannelID, room)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(message))
 	if err != nil {
@@ -45,7 +45,7 @@ func (s *Scaledrone) Publish(message []byte, room string) error {
 }
 
 // PublishToRooms sends a message to an array of rooms
-func (s *Scaledrone) PublishToRooms(message []byte, rooms []string) error {
+func (s *Client) PublishToRooms(message []byte, rooms []string) error {
 	url := fmt.Sprintf(baseURL+"/%s/publish/rooms", s.ChannelID)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(message))
 	if err != nil {
@@ -65,7 +65,7 @@ type usersCount struct {
 }
 
 // UsersCount returns how many users have connected to the channel
-func (s *Scaledrone) UsersCount() (int, error) {
+func (s *Client) UsersCount() (int, error) {
 	url := fmt.Sprintf(baseURL+"/%s/stats", s.ChannelID)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -84,7 +84,7 @@ func (s *Scaledrone) UsersCount() (int, error) {
 }
 
 // UsersInRooms returns an array of members who have joined single or multiple rooms
-func (s *Scaledrone) UsersInRooms() ([]string, error) {
+func (s *Client) UsersInRooms() ([]string, error) {
 	url := fmt.Sprintf(baseURL+"/%s/members", s.ChannelID)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -103,7 +103,7 @@ func (s *Scaledrone) UsersInRooms() ([]string, error) {
 }
 
 // ActiveRooms returns an array of rooms that are not empty
-func (s *Scaledrone) ActiveRooms() ([]string, error) {
+func (s *Client) ActiveRooms() ([]string, error) {
 	url := fmt.Sprintf(baseURL+"/%s/rooms", s.ChannelID)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -122,7 +122,7 @@ func (s *Scaledrone) ActiveRooms() ([]string, error) {
 }
 
 // UsersInRoom returns an array of members subscribed to a room
-func (s *Scaledrone) UsersInRoom(room string) ([]string, error) {
+func (s *Client) UsersInRoom(room string) ([]string, error) {
 	url := fmt.Sprintf(baseURL+"/%s/%s/members", s.ChannelID, room)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -141,7 +141,7 @@ func (s *Scaledrone) UsersInRoom(room string) ([]string, error) {
 }
 
 // RoomMembers returns a room name to members array map of all non empty rooms
-func (s *Scaledrone) RoomMembers() (map[string][]string, error) {
+func (s *Client) RoomMembers() (map[string][]string, error) {
 	url := fmt.Sprintf(baseURL+"/%s/room-members", s.ChannelID)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -159,7 +159,7 @@ func (s *Scaledrone) RoomMembers() (map[string][]string, error) {
 	return data, nil
 }
 
-func (s *Scaledrone) setAuth(req *http.Request) {
+func (s *Client) setAuth(req *http.Request) {
 	if s.SecretKey != "" {
 		req.SetBasicAuth(s.ChannelID, s.SecretKey)
 	} else {
@@ -167,7 +167,7 @@ func (s *Scaledrone) setAuth(req *http.Request) {
 	}
 }
 
-func (s *Scaledrone) doRequest(req *http.Request) ([]byte, error) {
+func (s *Client) doRequest(req *http.Request) ([]byte, error) {
 	s.setAuth(req)
 	client := &http.Client{}
 	resp, err := client.Do(req)

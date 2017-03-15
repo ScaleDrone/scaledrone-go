@@ -7,9 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var client *Scaledrone
-
-func getClient() *Scaledrone {
+func getClient() *Client {
 	return NewBasicAuthClient(os.Getenv("CHANNEL_ID"), os.Getenv("SECRET_KEY"))
 }
 
